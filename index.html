@@ -6,6 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Tijger Knuffel Shop</title>
+    <!-- Oude lettertype behouden -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -242,6 +243,10 @@
             nav a {
                 margin-left: 8px;
             }
+
+            .theme-toggle {
+                display: none;
+            }
         }
     </style>
 
@@ -249,11 +254,9 @@
 </head>
 
 <body>
-
-
     <header>
         <div class="brand">
-            <div style="font-weight:700">Tijger Knuffel </div>
+            <div style="font-weight:700">Tijger Knuffel</div>
             <div class="muted" style="font-size:12px"></div>
         </div>
         <nav>
@@ -261,9 +264,10 @@
             <a href="#cart">Winkelmandje</a>
             <a href="#about">Info</a>
             <button class="theme-toggle" id="themeToggle">Thema</button>
-            <a href="#cart"> <span id="cart-count" class="cart-badge" style="display:none">0</span></a>
+            <a href="#cart"><span id="cart-count" class="cart-badge" style="display:none">0</span></a>
         </nav>
     </header>
+
 
     <main id="app">
         <section id="product" class="page active">
@@ -310,15 +314,13 @@
         <section id="about" class="page">
             <div class="card">
                 <h2>Waarom verkopen we tijgers?</h2>
-                <p class="muted">
-                    Geen zorgen, het zijn maar knuffeltijgers! We verkopen deze knuffeltijgers omdat veel kinderen bang
-                    zijn, vooral 's avonds. Ons doel is dat kinderen zich veiliger voelen als ze gaan slapen. Tijgers
-                    zijn vaak krachtige dieren in kinderfilms, en daardoor voelt het kind zich gerustgesteld met zo'n
-                    sterk beestje naast zich. Elke knuffel wordt geleverd in een mooie, grote doos met een doorzichtige
-                    voorkant. In de voorkant zit een klein gat zodat je de zachte vacht kunt voelen. Deze tijger heeft
-                    ook zijn eigen specialiteiten: bijvoorbeeld, als je aan zijn staart trekt, komt er licht uit de ogen
-                    van de knuffel.
-                </p>
+                <p class="muted">Geen zorgen, het zijn maar knuffeltijgers! We verkopen deze knuffeltijgers omdat veel
+                    kinderen bang zijn, vooral 's avonds. Ons doel is dat kinderen zich veiliger voelen als ze gaan
+                    slapen. Tijgers zijn vaak krachtige dieren in kinderfilms, en daardoor voelt het kind zich
+                    gerustgesteld met zo'n sterk beestje naast zich. Elke knuffel wordt geleverd in een mooie, grote
+                    doos met een doorzichtige voorkant. In de voorkant zit een klein gat zodat je de zachte vacht kunt
+                    voelen. Deze tijger heeft ook zijn eigen specialiteiten: bijvoorbeeld, als je aan zijn staart trekt,
+                    komt er licht uit de ogen van de knuffel.</p>
             </div>
         </section>
     </main>
@@ -330,135 +332,43 @@
         const product = { id: 'tijger-40', name: 'Zachte Tijger Knuffel 1 m', price: 39.99 };
         let qty = 1;
 
-        function readCart() {
-            try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {} }
-            catch (e) { return {} }
-        }
-        function writeCart(cart) {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(cart));
-            renderCartCount();
-            renderCartPage();
-        }
+        function readCart() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {} } catch (e) { return {} } }
+        function writeCart(cart) { localStorage.setItem(STORAGE_KEY, JSON.stringify(cart)); renderCartCount(); renderCartPage(); }
 
-        function addToCart() {
-            const cart = readCart();
-            if (!cart[product.id]) cart[product.id] = { ...product, qty: 0 };
-            cart[product.id].qty += qty;
-            writeCart(cart);
-            showToast('Toegevoegd!');
-        }
+        function addToCart() { const cart = readCart(); if (!cart[product.id]) cart[product.id] = { ...product, qty: 0 }; cart[product.id].qty += qty; writeCart(cart); showToast('Toegevoegd!'); }
         function removeFromCart(id) { const cart = readCart(); delete cart[id]; writeCart(cart); }
         function increaseItem(id) { const cart = readCart(); if (cart[id]) { cart[id].qty += 1; writeCart(cart); } }
         function decreaseItem(id) { const cart = readCart(); if (cart[id]) { cart[id].qty -= 1; if (cart[id].qty <= 0) delete cart[id]; writeCart(cart); } }
 
-        function renderCartCount() {
-            const cart = readCart();
-            const count = Object.values(cart).reduce((s, i) => s + i.qty, 0);
-            const el = document.getElementById('cart-count');
-            if (count > 0) { el.style.display = 'inline-block'; el.textContent = count; } else el.style.display = 'none';
-        }
+        function renderCartCount() { const cart = readCart(); const count = Object.values(cart).reduce((s, i) => s + i.qty, 0); const el = document.getElementById('cart-count'); if (count > 0) { el.style.display = 'inline-block'; el.textContent = count; } else el.style.display = 'none'; }
 
-        function renderCartPage() {
-            const container = document.getElementById('cart-contents');
-            const cart = readCart();
-            if (Object.keys(cart).length === 0) { container.textContent = 'Je mandje is leeg.'; return; }
-            container.innerHTML = '';
-            Object.values(cart).forEach(item => {
-                const div = document.createElement('div'); div.className = 'cart-item card';
-                div.innerHTML = '<div class="thumb">' + item.name[0] + '</div><div style="flex:1"><div style="font-weight:700">' + item.name + '</div><div class="muted">€' + item.price.toFixed(2) + ' × ' + item.qty + '</div></div><div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end"><div style="font-weight:700">€' + (item.price * item.qty).toFixed(2) + '</div><div style="display:flex;gap:6px"></div></div>';
-                const btnDec = document.createElement('button'); btnDec.textContent = '-'; btnDec.onclick = () => decreaseItem(item.id);
-                const btnInc = document.createElement('button'); btnInc.textContent = '+'; btnInc.onclick = () => increaseItem(item.id);
-                const btnRemove = document.createElement('button'); btnRemove.textContent = 'Verwijder'; btnRemove.style.background = '#000'; btnRemove.style.color = '#fff'; btnRemove.onclick = () => removeFromCart(item.id);
-                div.querySelector('div[style*="display:flex;gap:6px"]').append(btnDec, btnInc, btnRemove);
-                container.appendChild(div);
-            });
-            const total = Object.values(cart).reduce((s, i) => s + i.price * i.qty, 0);
-            const totalDiv = document.createElement('div'); totalDiv.style.cssText = 'margin-top:12px;text-align:right;font-weight:700'; totalDiv.textContent = 'Totaal: €' + total.toFixed(2); container.appendChild(totalDiv);
-        }
+        function renderCartPage() { const container = document.getElementById('cart-contents'); const cart = readCart(); if (Object.keys(cart).length === 0) { container.textContent = 'Je mandje is leeg.'; return; } container.innerHTML = ''; Object.values(cart).forEach(item => { const div = document.createElement('div'); div.className = 'cart-item card'; div.innerHTML = '<div class="thumb">' + item.name[0] + '</div><div style="flex:1"><div style="font-weight:700">' + item.name + '</div><div class="muted">€' + item.price.toFixed(2) + ' × ' + item.qty + '</div></div><div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end"><div style="font-weight:700">€' + (item.price * item.qty).toFixed(2) + '</div><div style="display:flex;gap:6px"></div></div>'; const btnDec = document.createElement('button'); btnDec.textContent = '-'; btnDec.onclick = () => decreaseItem(item.id); const btnInc = document.createElement('button'); btnInc.textContent = '+'; btnInc.onclick = () => increaseItem(item.id); const btnRemove = document.createElement('button'); btnRemove.textContent = 'Verwijder'; btnRemove.style.background = '#000'; btnRemove.style.color = '#fff'; btnRemove.onclick = () => removeFromCart(item.id); div.querySelector('div[style*="display:flex;gap:6px"]').append(btnDec, btnInc, btnRemove); container.appendChild(div); }); const total = Object.values(cart).reduce((s, i) => s + i.price * i.qty, 0); const totalDiv = document.createElement('div'); totalDiv.style.cssText = 'margin-top:12px;text-align:right;font-weight:700'; totalDiv.textContent = 'Totaal: €' + total.toFixed(2); container.appendChild(totalDiv); }
 
-        function showPage(id) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            const el = document.getElementById(id) || document.getElementById('product');
-            el.classList.add('active');
-            window.location.hash = '#' + id;
-            if (id === 'cart') renderCartPage();
-        }
-        function initRouting() {
-            const hash = (location.hash || '#product').replace('#', '');
-            showPage(hash);
-            window.addEventListener('hashchange', () => {
-                showPage((location.hash || '#product').replace('#', ''));
-            });
-        }
+        function showPage(id) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); const el = document.getElementById(id) || document.getElementById('product'); el.classList.add('active'); window.location.hash = '#' + id; if (id === 'cart') renderCartPage(); }
+        function initRouting() { const hash = (location.hash || '#product').replace('#', ''); showPage(hash); window.addEventListener('hashchange', () => { showPage((location.hash || '#product').replace('#', '')); }); }
 
-        function showToast(msg) {
-            const t = document.createElement('div'); t.textContent = msg; t.style.position = 'fixed'; t.style.left = '50%'; t.style.transform = 'translateX(-50%)'; t.style.bottom = '92px'; t.style.background = '#111'; t.style.color = '#fff'; t.style.padding = '10px 14px'; t.style.borderRadius = '10px'; t.style.opacity = '0'; t.style.transition = 'opacity .2s,bottom .2s'; document.body.appendChild(t);
-            requestAnimationFrame(() => { t.style.opacity = '1'; t.style.bottom = '102px'; });
-            setTimeout(() => { t.style.opacity = '0'; t.style.bottom = '82px'; setTimeout(() => t.remove(), 300); }, 1800);
-        }
+        function showToast(msg) { const t = document.createElement('div'); t.textContent = msg; t.style.position = 'fixed'; t.style.left = '50%'; t.style.transform = 'translateX(-50%)'; t.style.bottom = '92px'; t.style.background = '#111'; t.style.color = '#fff'; t.style.padding = '10px 14px'; t.style.borderRadius = '10px'; t.style.opacity = '0'; t.style.transition = 'opacity .2s,bottom .2s'; document.body.appendChild(t); requestAnimationFrame(() => { t.style.opacity = '1'; t.style.bottom = '102px'; }); setTimeout(() => { t.style.opacity = '0'; t.style.bottom = '82px'; setTimeout(() => t.remove(), 300); }, 1800); }
 
         document.addEventListener('DOMContentLoaded', () => {
-            initRouting();
-            renderCartCount();
-
+            initRouting(); renderCartCount();
             document.getElementById('inc').addEventListener('click', () => { qty++; document.getElementById('qty').textContent = qty; });
             document.getElementById('dec').addEventListener('click', () => { qty = Math.max(1, qty - 1); document.getElementById('qty').textContent = qty; });
             document.getElementById('add-to-cart').addEventListener('click', addToCart);
 
-            document.getElementById('clear-cart').addEventListener('click', () => {
-                localStorage.removeItem(STORAGE_KEY);
-                renderCartPage();
-                renderCartCount();
-                showToast('Mandje is geleegd');
-            });
+            document.getElementById('clear-cart').addEventListener('click', () => { localStorage.removeItem(STORAGE_KEY); renderCartPage(); renderCartCount(); showToast('Mandje is geleegd'); });
 
             document.getElementById('checkout').addEventListener('click', () => {
-                const cart = readCart();
-                if (Object.keys(cart).length === 0) {
-                    showToast('Je mandje is leeg!');
-                    return;
-                }
-                const STRIPE_URL = '';
-                window.location.href = STRIPE_URL;
+                const cart = readCart(); if (Object.keys(cart).length === 0) { showToast('Je mandje is leeg!'); return; }
+                const STRIPE_URL = ''; window.location.href = STRIPE_URL;
             });
 
-            const images = ['........', 'tijger.'];
-            let currentImg = 0;
-            const productImg = document.getElementById('product-img');
-            document.getElementById('switch-img').addEventListener('click', () => {
-                currentImg = (currentImg + 1) % images.length;
-                productImg.src = images[currentImg];
-            });
+            const images = ['........', '....']; let currentImg = 0; const productImg = document.getElementById('product-img'); document.getElementById('switch-img').addEventListener('click', () => { currentImg = (currentImg + 1) % images.length; productImg.src = images[currentImg]; });
 
-            let darkMode = false;
-            const applyTheme = () => {
-                document.body.style.background = darkMode ? 'var(--bg-dark)' : 'var(--bg-light)';
-                document.body.style.color = darkMode ? 'var(--text-dark)' : 'var(--text-light)';
-                document.querySelectorAll('.card').forEach(c => {
-                    c.style.background = darkMode ? '#222' : 'var(--card)';
-                    c.style.color = darkMode ? '#fff' : 'var(--text-light)';
-                });
-                document.querySelectorAll('button').forEach(b => {
-                    if (b.classList.contains('switch-btn')) {
-                        b.style.background = darkMode ? '#fff' : '#000';
-                        b.style.color = darkMode ? '#000' : '#fff';
-                    } else {
-                        b.style.background = darkMode ? '#fff' : '#000';
-                        b.style.color = darkMode ? '#000' : '#fff';
-                    }
-                });
-                document.querySelector('header').style.background = darkMode ? '#222' : '#fff';
-            };
-            applyTheme();
-            document.getElementById('themeToggle').addEventListener('click', () => {
-                darkMode = !darkMode;
-                applyTheme();
-            });
+            let darkMode = false; const applyTheme = () => { document.body.style.background = darkMode ? 'var(--bg-dark)' : 'var(--bg-light)'; document.body.style.color = darkMode ? 'var(--text-dark)' : 'var(--text-light)'; document.querySelectorAll('.card').forEach(c => { c.style.background = darkMode ? '#222' : 'var(--card)'; c.style.color = darkMode ? '#fff' : 'var(--text-light)'; }); document.querySelectorAll('button').forEach(b => { if (b.classList.contains('switch-btn')) { b.style.background = darkMode ? '#fff' : '#000'; b.style.color = darkMode ? '#000' : '#fff'; } else { b.style.background = darkMode ? '#fff' : '#000'; b.style.color = darkMode ? '#000' : '#fff'; } }); document.querySelector('header').style.background = darkMode ? '#222' : '#fff'; }; applyTheme();
+            const themeBtn = document.getElementById('themeToggle'); if (themeBtn) { themeBtn.addEventListener('click', () => { darkMode = !darkMode; applyTheme(); }); }
         });
 
-        window.removeFromCart = removeFromCart;
-        window.increaseItem = increaseItem;
-        window.decreaseItem = decreaseItem;
+        window.removeFromCart = removeFromCart; window.increaseItem = increaseItem; window.decreaseItem = decreaseItem;
     </script>
 
 
